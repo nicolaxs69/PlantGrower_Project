@@ -1,2 +1,5 @@
 # PlantGrower_Project
- :seedling: :tomato:  Automated open source indoor grower for plants and vegetables, using Raspberry Pi and Node MCU Esp32s . Lets eat organic!
+Fully automated open source indoor grower for plants and vegetables. 
+
+# How it Works?
+![arquitecture- hardware](https://s3.amazonaws.com/imagestuffs/PLANT.jpg)
