@@ -1,4 +1,4 @@
-require('dotenv').config()
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
@@ -7,10 +7,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 // Routes
-const plantStatusRoutes = require("./api/routes/plantStatus");
-
-// Connect DB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useCreateIndex: true })
+const routes = require('./api/routes')
 
 // App execution
 app.use(morgan("dev"));
@@ -19,21 +16,18 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Routes wich should handle requests
-app.use("/plantStatus", plantStatusRoutes);
+app.use(routes)
 
-app.use((req, res, next) => {
-  const error = new Error("NOT FOUND");
-  error.status(404);
-  next(error);
+// Connect DB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useCreateIndex: true
 });
 
-app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message
-    }
-  });
-});
+var db = mongoose.connection
+db.on('error', console.error.bind(console, 'connection error:'))
+db.once('open', () => {
+  console.log("Server running")
+})
 
 module.exports = app;
