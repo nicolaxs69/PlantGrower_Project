@@ -1,0 +1,5 @@
+{
+    "env": {
+         "process.env.MONGO_ATLAS_PASSWORD": "legolas4129"
+    }
+}
