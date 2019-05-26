@@ -6,8 +6,11 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+
 // Routes
 const routes = require('./api/routes')
+const  mqtt = require('./api/mqtt/mqttConnection')
+
 
 // App execution
 app.use(morgan("dev"));
@@ -28,6 +31,8 @@ var db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
   console.log("Server running")
+  mqtt.connect();
+  //mqtt.insertData();
 })
 
 module.exports = app;
