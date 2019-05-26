@@ -6,6 +6,9 @@ const mqtt_client = mqtt.connect(mqttUri); // Mqt Client
 var message = "on"; // Mqtt pu
 var topic = "esp32/output";
 
+const PlantStatus = require("../models/plantStatus");
+
+
 // Subscribe to mqtt topic
 exports.connect = function() {
   mqtt_client.on("connect", function() {
@@ -13,10 +16,9 @@ exports.connect = function() {
   });
 }
 
-exports.inserData = function() {
+exports.insertData = function() {
   mqtt_client.on("message", function(topic, message) {
     const obj = JSON.parse(message);
-
     const plantStatus = new PlantStatus({
       _id: new mongoose.Types.ObjectId(),
       soil: obj.soil,
@@ -26,7 +28,10 @@ exports.inserData = function() {
 
     plantStatus
     .save()
-    .then(result => {console.log(result)})
+    .then(result => {
+      //console.log(result)
+      console.log('Data inserted!')
+    })
     .catch(err => {console.log(err)});
   });
 }
