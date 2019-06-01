@@ -1,8 +1,35 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-
 const PlantStatus = require("../../models/plantStatus");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, "./uploads/");
+  },
+
+  filename: function(req, file, cb) {
+    cb(null, new Date().toISOString() + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  // reject a file
+  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5 //5 mb
+  },
+  fileFilter: fileFilter
+});
 
 router.get("/", (req, res, next) => {
   PlantStatus.find()
@@ -41,7 +68,9 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", (req, res, next) => {
+router.post("/", upload.single("statusImage"), (req, res, next) => {
+  console.log(req.file);
+
   const plantStatus = new PlantStatus({
     _id: new mongoose.Types.ObjectId(),
     soil: req.body.soil,
@@ -65,6 +94,33 @@ router.post("/", (req, res, next) => {
       });
     });
 });
+
+// POST without image
+// router.post("/",(req, res, next) => {
+
+//   const plantStatus = new PlantStatus({
+//     _id: new mongoose.Types.ObjectId(),
+//     soil: req.body.soil,
+//     light: req.body.light,
+//     temp: req.body.temp
+//   });
+
+//   plantStatus
+//     .save()
+//     .then(result => {
+//       //console.log(result);
+//       res.status(200).json({
+//         message: "Status created",
+//         createdPlatStatus: result
+//       });
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({
+//         error: err
+//       });
+//     });
+// });
 
 router.get("/:plantStatusId", (req, res, next) => {
   const id = req.params.plantStatusId;
