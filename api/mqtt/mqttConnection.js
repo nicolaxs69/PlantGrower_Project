@@ -6,7 +6,7 @@ const mqtt_client = mqtt.connect(mqttUri); // Mqt Client
 var message = "on"; // Mqtt pu
 var topic = "esp32/output";
 
-const PlantStatus = require("../models/plantStatus");
+const PlantStatus = require("../models/status");
 
 
 // Subscribe to mqtt topic

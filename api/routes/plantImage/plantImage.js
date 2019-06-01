@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const PlantImage = require("../../models/plantImage");
+const PlantImage = require("../../models/image");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
