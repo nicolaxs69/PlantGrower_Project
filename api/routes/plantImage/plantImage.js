@@ -79,7 +79,7 @@ router.post("/", upload.single("image"), (req, res, next) => {
     .then(result => {
       //console.log(result);
       res.status(200).json({
-        message: "Status created",
+        message: "Image upload succesfull",
         createdPlatImage: result
       });
     })
