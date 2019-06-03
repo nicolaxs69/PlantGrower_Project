@@ -4,7 +4,7 @@
 
 const char* ssid = "Bunker2019";
 const char* password =  "fancy";
-const char* mqttServer = "192.168.1.112";
+const char* mqttServer = "192.168.1.98";
 const int mqttPort = 1883;
 
 // Variables

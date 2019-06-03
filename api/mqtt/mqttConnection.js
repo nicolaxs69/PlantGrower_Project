@@ -29,7 +29,7 @@ exports.insertData = function() {
     plantStatus
     .save()
     .then(result => {
-      //console.log(result)
+      console.log(result)
       console.log('Data inserted!')
     })
     .catch(err => {console.log(err)});
