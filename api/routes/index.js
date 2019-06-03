@@ -7,7 +7,7 @@ router.get('/', (req, res, next) => {
 
 router.use("/plantStatus", require("./plantStatus/plantStatus"));
 router.use("/plantImage", require("./plantImage/plantImage"));
-//router.use("/user", require("./user/user"));
+router.use("/user", require("./user/user"));
 
 // catch 404 and forward to error handler
 router.use((req, res, next) => {

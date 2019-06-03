@@ -134,7 +134,7 @@ void reconnect() {
 
 void sending_flag() {
 
-  for (int i = 0; i <= 3; i++) {
+  for (int i = 0; i <= 1; i++) {
     digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(50);                       // wait for a second
     digitalWrite(ledPin, LOW);    // turn the LED off by making the voltage LOW
