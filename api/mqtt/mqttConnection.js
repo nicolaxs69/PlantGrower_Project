@@ -15,9 +15,9 @@ exports.connect = function() {
   mqtt_client.on("connect", function() {
     mqtt_client.subscribe(process.env.MQTT_STATUS_CHANNEL);
     //waterPlant(bumpChannel, On);
-    growLight(growLightChannel, Off);
-    // startLightCycle();
-    // finishLightCycle();
+    //growLight(growLightChannel, Off);
+     startLightCycle();
+     finishLightCycle();
   });
 };
 
@@ -66,7 +66,7 @@ function growLight(topic, messa) {
 }
 
 function startLightCycle (){
-  cron.schedule('31 17 * * *', () => {
+  cron.schedule('00 18 * * *', () => {
     growLight(growLightChannel, On);
   }, {
     scheduled: true,
@@ -75,7 +75,7 @@ function startLightCycle (){
 }
 
 function finishLightCycle (){
-  cron.schedule('31 5 * * *', () => {
+  cron.schedule('00 6 * * *', () => {
     growLight(growLightChannel, Off);
   }, {
     scheduled: true,
