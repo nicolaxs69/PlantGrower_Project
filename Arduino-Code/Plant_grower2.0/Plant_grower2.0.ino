@@ -1,66 +1,117 @@
+/*
+  Plant Grower Project
+
+  Turns an LED on for one second, then off for one second, repeatedly.
+
+  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
+  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
+  the correct LED pin independent of which board is used.
+  If you want to know what pin the on-board LED is connected to on your Arduino
+  model, check the Technical Specs of your board at:
+  https://www.arduino.cc/en/Main/Products
+
+
+  by Nicolas Escobar Cruz
+
+  This example code is in the public domain.
+
+  http://www.arduino.cc/en/Tutorial/Blink
+*/
+
+
+//Libraries used
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <DHT.h>
 
+
+// Mqtt variables
 const char* ssid = "Bunker2019";
 const char* password =  "fancy";
-const char* mqttServer = "192.168.1.98";
+const char* mqttServer = "192.168.1.110";
 const int mqttPort = 1883;
 
-// Variables
+//Variables
 long randNumber;
 long randNumber2;
 long randNumber3;
 long lastMsg = 0;
 char msg[50];
 int state = LOW;
-float soil_moisture = 0;
+float moisture_moisture = 0;
 
-// Sensors
+// Pin sensors
 const int ledPin = 2; // LED Pin
 const int water_pump = 23; // Water Pump
-const float sensor_pin = 36;// Soil moisture
+const float sensor_pin = 36;// moisture moisture
+int soil_moisture = 0;
 
+
+#define DHTPIN 23
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+
+// Libraries client
 WiFiClient espClient;
 PubSubClient client(espClient);
+
 
 void setup() {
 
   Serial.begin(115200);
-  Serial.println();
+  analogReadResolution(10);   // Set a 10 bit resolution for the analog input GPIO 36
+  dht.begin();                 // Start Dht11 sensor
+  pinMode(ledPin, OUTPUT);
+  pinMode(water_pump, OUTPUT);
+
+  // Execute Esp32 mqtt connection to broker
   setup_wifi();
+
   Serial.println("Connected to the WiFi network");
   client.setServer(mqttServer, mqttPort);
   client.setCallback(callback);
-  pinMode(ledPin, OUTPUT);
-  pinMode(water_pump, OUTPUT);
 }
 
 void loop() {
 
+  //Retry connection when disconnected from broker
   if (!client.connected()) {
+    client.disconnect();
     reconnect();
   }
   client.loop();
 
+  // Loop every 5 sec, using the millis function (Better than delay, do not stop the Esp32 processing queue)
   long now = millis();
   if (now - lastMsg > 5000) {
     lastMsg = now;
 
+
+    soil_moisture = analogRead(sensor_pin); // Soil moisture reading
+    //Map reading format caibrated as: (sensorValue, min, max , 100%, 0%)
+    int percentMoist = map(soil_moisture, 381, 810, 100, 0); /
+
+    float humidity = dht.readHumidity();   // Relative humidity reading
+    float  = dht.readTemperature();       // Temperature reading
+
+    // Check if there is something wrong with the reading
+    if (isnan(humidity) || isnan(temperature)) {
+      Serial.println("Error obteniendo los datos del sensor DHT11");
+      return;
+    }    
+
+    // Encapsule data readings in a JSON format and publish to the broker
     const int capacity = JSON_OBJECT_SIZE(3);
     StaticJsonDocument<capacity> doc;
 
-    randNumber = random(300);
-    randNumber2 = random(300);
-    randNumber3 = random(300);
-
-    doc["soil"] = randNumber;
-    doc["light"] = randNumber2;
-    doc["temp"] = randNumber3;
+    doc["moisture"] = percentMoist;
+    doc["humidity"] = humidity;
+    doc["temperature"] = temperature;
 
     char dataBuffer[100];
     serializeJson(doc, dataBuffer);
-    //dtostrf(randNumber, 1, 2, dataBuffer);
     Serial.println("Sending message to MQTT topic..");
     Serial.println(dataBuffer);
     client.publish("esp32/humidity", dataBuffer);
@@ -71,6 +122,7 @@ void loop() {
   }
 }
 
+// Callback from broker. Here we recieved mesages sent from the broker server, and control things!
 void callback(char* topic, byte* message, unsigned int length) {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);

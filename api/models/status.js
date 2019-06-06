@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const plantStatusSchema = mongoose.Schema(
   {
     _id: mongoose.Schema.Types.ObjectId,
-    soil: { type: Number, required: true },
-    light: { type: Number, required: true },
-    temp: { type: Number, required: true }
+    moisture: { type: Number, required: true },
+    humidity: { type: Number, required: true },
+    temperature: { type: Number, required: true }
   },
   {
     timestamps: true

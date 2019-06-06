@@ -21,9 +21,9 @@ exports.insertData = function() {
     const obj = JSON.parse(message);
     const plantStatus = new PlantStatus({
       _id: new mongoose.Types.ObjectId(),
-      soil: obj.soil,
-      light: obj.light,
-      temp: obj.temp
+      moisture: obj.moisture,
+      humidity: obj.humidity,
+      temperature: obj.temperature
     });
 
     plantStatus

@@ -33,16 +33,16 @@ const upload = multer({
 
 router.get("/", (req, res, next) => {
   PlantStatus.find()
-    .select("soil light temp createdAt _id")
+    .select("moisture humidity temperature createdAt _id")
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
         statusPlant: docs.map(doc => {
           return {
-            soil: doc.soil,
-            light: doc.light,
-            temp: doc.temp,
+            moisture: doc.moisture,
+            humidity: doc.humidity,
+            temperature: doc.temperature,
             date: doc.createdAt,
             _id: doc._id,
             request: {
@@ -73,9 +73,9 @@ router.post("/", upload.single("statusImage"), (req, res, next) => {
 
   const plantStatus = new PlantStatus({
     _id: new mongoose.Types.ObjectId(),
-    soil: req.body.soil,
-    light: req.body.light,
-    temp: req.body.temp
+    moisture: req.body.moisture,
+    humidity: req.body.humidity,
+    temperature: req.body.temperature
   });
 
   plantStatus
@@ -100,9 +100,9 @@ router.post("/", upload.single("statusImage"), (req, res, next) => {
 
 //   const plantStatus = new PlantStatus({
 //     _id: new mongoose.Types.ObjectId(),
-//     soil: req.body.soil,
-//     light: req.body.light,
-//     temp: req.body.temp
+//     moisture: req.body.moisture,
+//     humidity: req.body.humidity,
+//     temperature: req.body.temperature
 //   });
 
 //   plantStatus
