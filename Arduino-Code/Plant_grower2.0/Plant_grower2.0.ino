@@ -29,7 +29,7 @@
 // Mqtt variables
 const char* ssid = "Bunker2019";
 const char* password =  "fancy";
-const char* mqttServer = "192.168.1.110";
+const char* mqttServer = "192.168.1.98";
 const int mqttPort = 1883;
 
 //Variables
@@ -43,6 +43,7 @@ float moisture_moisture = 0;
 
 // Pin sensors
 const int ledPin = 2; // LED Pin
+const int lightPin = 32; // Growth light
 const int water_pump = 23; // Water Pump
 const float sensor_pin = 36;// moisture moisture
 int soil_moisture = 0;
@@ -64,6 +65,7 @@ void setup() {
   analogReadResolution(10);   // Set a 10 bit resolution for the analog input GPIO 36
   dht.begin();                 // Start Dht11 sensor
   pinMode(ledPin, OUTPUT);
+  pinMode(lightPin, OUTPUT);
   pinMode(water_pump, OUTPUT);
 
   // Execute Esp32 mqtt connection to broker
@@ -91,16 +93,16 @@ void loop() {
 
     soil_moisture = analogRead(sensor_pin); // Soil moisture reading
     //Map reading format caibrated as: (sensorValue, min, max , 100%, 0%)
-    int percentMoist = map(soil_moisture, 381, 810, 100, 0); /
+    int percentMoist = map(soil_moisture, 381, 810, 100, 0);
 
     float humidity = dht.readHumidity();   // Relative humidity reading
-    float  = dht.readTemperature();       // Temperature reading
+    float temperature = dht.readTemperature();       // Temperature reading
 
     // Check if there is something wrong with the reading
     if (isnan(humidity) || isnan(temperature)) {
       Serial.println("Error obteniendo los datos del sensor DHT11");
       return;
-    }    
+    }
 
     // Encapsule data readings in a JSON format and publish to the broker
     const int capacity = JSON_OBJECT_SIZE(3);
@@ -114,7 +116,7 @@ void loop() {
     serializeJson(doc, dataBuffer);
     Serial.println("Sending message to MQTT topic..");
     Serial.println(dataBuffer);
-    client.publish("esp32/humidity", dataBuffer);
+    client.publish("esp32/status", dataBuffer);
 
     client.loop();
     Serial.println("-------------");
@@ -135,9 +137,18 @@ void callback(char* topic, byte* message, unsigned int length) {
   }
   Serial.println();
 
-  if (String(topic) == "esp32/output") {
+  if (String(topic) == "esp32/bump") {
     if (messageTemp == "on") {
       //refresh_plant();
+      Serial.println("hola");
+    }
+  }
+
+  if (String(topic) == "esp32/light") {
+    if (messageTemp == "on") {
+      digitalWrite(lightPin, HIGH);
+    } else {
+      digitalWrite(lightPin, LOW);
     }
   }
 }
@@ -172,7 +183,8 @@ void reconnect() {
       Serial.println("connected");
       connected_flag(15, 50);
       // Subscribe
-      client.subscribe("esp32/output");
+      client.subscribe("esp32/bump");
+      client.subscribe("esp32/light");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
