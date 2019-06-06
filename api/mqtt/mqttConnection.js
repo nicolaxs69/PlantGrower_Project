@@ -66,7 +66,7 @@ function growLight(topic, messa) {
 }
 
 function startLightCycle (){
-  cron.schedule('00 18 * * *', () => {
+  cron.schedule('25 18 * * *', () => {
     growLight(growLightChannel, On);
   }, {
     scheduled: true,
@@ -75,7 +75,7 @@ function startLightCycle (){
 }
 
 function finishLightCycle (){
-  cron.schedule('00 6 * * *', () => {
+  cron.schedule('25 6 * * *', () => {
     growLight(growLightChannel, Off);
   }, {
     scheduled: true,
